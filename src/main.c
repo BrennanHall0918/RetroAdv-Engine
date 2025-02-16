@@ -33,8 +33,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
         return SDL_APP_FAILURE;
     }
 
-    state->player_texture =
-        IMG_LoadTexture(state->renderer, "./char_spritesheet.png");
+    state->player_texture = IMG_LoadTexture(state->renderer, "char_spritesheet.png");
+
+    if (!state->player_texture) {
+        log_error("Error getting texture");
+        return SDL_APP_FAILURE;
+    }    
 
     return SDL_APP_CONTINUE;
 }
