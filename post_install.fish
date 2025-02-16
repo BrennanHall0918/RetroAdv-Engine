@@ -13,7 +13,9 @@ pwd
 rm -vf bin/*.a
 rm -vf bin/showanim.exe
 rm -vf bin/showimage.exe
-rm -rvf lib
+#rm -rvf lib
+mv lib/* bin
+rmdir lib
 
 #Why is this needed??
 cp bin/libSDL3_shared.dll bin/SDL3.dll
