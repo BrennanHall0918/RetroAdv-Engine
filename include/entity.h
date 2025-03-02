@@ -6,8 +6,9 @@
 typedef struct {
     void (*destroy)(void*);
     void (*handle_events)(void*, SDL_Event*);
-    void (*update)(void*);
+    void (*update)(void*, float delta_time);
     void (*render)(void*, SDL_Renderer*);
+    float speed;
 
     SDL_Texture *texture;
 

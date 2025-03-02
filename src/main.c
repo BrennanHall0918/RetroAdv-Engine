@@ -14,6 +14,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     *appstate = state;
     state->entities = malloc(sizeof(entity_t)*N_ENTITIES);
 
+    state->last_tick = 0;
+    state->current_tick = 0;
+
     if (!SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         SDL_Log("%s\n", SDL_GetError());
         return SDL_APP_FAILURE;

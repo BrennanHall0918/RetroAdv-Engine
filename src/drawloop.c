@@ -1,7 +1,7 @@
 #include "app.h"
 #include "entity.h"
 
-
+#include <stdio.h>
 
 void render(app_t* state)
 {
@@ -13,20 +13,16 @@ void render(app_t* state)
 		state->entities[i].render((void*)(state->entities+i), state->renderer);
 	}
 
-
-/*
-	state->player_sprite_offset_rect = create_rect(18, 17, 13, 15);
-	state->player_location 	= create_rect(100, 100, 13, 15);
-	SDL_SetTextureScaleMode(state->player_texture, SDL_SCALEMODE_NEAREST); 
-	SDL_RenderTexture(state->renderer, state->player_texture, &(state->player_sprite_offset_rect), &(state->player_location));
-*/
-
 	SDL_RenderPresent(state->renderer);
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
 	app_t* state = (app_t*) appstate;
+	state->last_tick = state->current_tick;
+	state->current_tick = SDL_GetTicks();
+	state->delta_time = (state->current_tick - state->last_tick) / 1000.0f;
+	printf("%f\n", state->delta_time);
 	render(state);
 	return SDL_APP_CONTINUE;
 }

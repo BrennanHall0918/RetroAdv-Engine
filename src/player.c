@@ -10,8 +10,31 @@ void handle_events(void* self, SDL_Event* event)
 {
 
 }
-void update(void* self)
+void update(void* self, float delta_time)
 {
+    const bool *keyboard_state = SDL_GetKeyboardState(NULL);
+
+    entity_t* entity = (entity_t*)self;
+
+    if (keyboard_state[SDL_SCANCODE_UP])
+    {
+        entity->location.y -= entity->speed * delta_time;
+    }
+
+    if (keyboard_state[SDL_SCANCODE_DOWN])
+    {
+        entity->location.y += entity->speed * delta_time;
+    }
+
+    if (keyboard_state[SDL_SCANCODE_LEFT])
+    {
+        entity->location.x -= entity->speed * delta_time;
+    }
+
+    if (keyboard_state[SDL_SCANCODE_RIGHT])
+    {
+        entity->location.x += entity->speed * delta_time;
+    }
 
 }
 void render_player(void* self, SDL_Renderer* renderer)
@@ -28,6 +51,7 @@ SDL_FRect create_rect(float x, float y, float w, float h)
 
 bool init_player (entity_t* entity, SDL_Renderer* renderer, char* path)
 {
+    entity->speed = 10;
     entity->destroy = &destroy;
     entity->handle_events = &handle_events;
     entity->update = &update;
