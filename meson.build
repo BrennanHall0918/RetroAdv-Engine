@@ -23,31 +23,11 @@ if os == 'windows'
   #
   # dynamic asan links libstc++.dll, let's link statically to avoid having to vendor the dll.
   add_project_arguments('-static-libasan', language: 'c')
-  cmake = import('cmake')
-  #SDL3
-  sdl3_opts = cmake.subproject_options()
-  sdl3_opts.set_install(true)
-  sdl3_proj = cmake.subproject('sdl3', options: sdl3_opts)
-  message('sdl targets:\n - ' + '\n - '.join(sdl3_proj.target_list()))
-  sdl = sdl3_proj.dependency('SDL3-shared')
-  #sdl_headers = sdl3_proj.dependency('SDL3_Headers')
-
-  # SDL3_image
-  sdl3_image_proj = cmake.subproject('sdl3_image', options: sdl3_opts)
-  message('sdl_image targets:\n - ' + '\n - '.join(sdl3_image_proj.target_list()))
-  sdl_image = sdl3_image_proj.dependency('SDL3_image-shared')
-
-  dependencies += [sdl, sdl_image]
-else
-  # SDL3
-  sdl = dependency('SDL3', method:'cmake')
-
-  # SDL3_image
-  sdl_image = dependency('SDL3_image', method: 'cmake')
-
-  dependencies += [sdl, sdl_image]
 endif
 
+sdl = dependency('SDL3', method:'cmake')
+sdl_image = dependency('SDL3_image', method: 'cmake')
+dependencies += [sdl, sdl_image]
 
 incdir = include_directories('include')
 
