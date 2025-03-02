@@ -7,12 +7,12 @@
 #include <stdlib.h>
 
 #include "app.h"
-
-void log_error(char *prefix) { SDL_Log("%s: %s", prefix, SDL_GetError()); }
+#include "entity.h"
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     app_t *state = malloc(sizeof(app_t));
     *appstate = state;
+    state->entities = malloc(sizeof(entity_t)*N_ENTITIES);
 
     if (!SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         SDL_Log("%s\n", SDL_GetError());
@@ -33,18 +33,23 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
         return SDL_APP_FAILURE;
     }
 
-    state->player_texture = IMG_LoadTexture(state->renderer, "char_spritesheet.png");
-
-    if (!state->player_texture) {
-        log_error("Error getting texture");
+    if (!init_player(&(state->entities[0]), state->renderer, "./char_spritesheet.png"))
+    {
         return SDL_APP_FAILURE;
-    }    
+    }
 
     return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
     app_t *state = (app_t *)appstate;
+
+    for (int i = 0; i < N_ENTITIES; i++)
+    {
+        state->entities[i].destroy((void*)(state->entities+i));
+    }
+
+    free(state->entities);
     SDL_DestroyWindow(state->window);
     free(appstate);
     return;
