@@ -19,7 +19,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
 	for (int i = 0; i < N_ENTITIES; i++) 
 	{
-		state->entities[i].update((void*)(state->entities+i));
+		state->entities[i].update((void*)(state->entities+i), state->delta_time);
 	}
 
 	return SDL_APP_CONTINUE;

@@ -3,8 +3,9 @@
 
 #include <SDL3/SDL.h>
 #include "entity.h"
+#include <inttypes.h>
 
-#define N_ENTITIES 2
+#define N_ENTITIES 1
 
 typedef struct {
 	SDL_Window *window;
@@ -20,6 +21,10 @@ typedef struct {
 	SDL_IOStreamInterface iface;
 
 	entity_t* entities;
+
+	uint64_t last_tick;
+	uint64_t current_tick;
+	float delta_time;
 } app_t;
 
 void log_error(char *prefix);
