@@ -38,6 +38,8 @@ executable(
       'src/main.c',
       'src/eventloop.c',
       'src/drawloop.c',
+      'src/player.c',
+      'src/utils.c',
   ],
   include_directories : incdir,
   dependencies: dependencies,
