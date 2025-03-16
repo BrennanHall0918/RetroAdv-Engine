@@ -36,7 +36,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
         return SDL_APP_FAILURE;
     }
 
-    if (!init_player(&(state->entities[0]), state->renderer, "./char_spritesheet.png"))
+    state->grass_tile = IMG_LoadTexture(state->renderer, "Grass_tile.png");
+
+    if (!state->grass_tile) {
+        log_error("Error getting texture");
+        return false;
+    }    
+
+    if (!init_entity(&(state->entities[0]), state->renderer, "./char_spritesheet.png"))
     {
         return SDL_APP_FAILURE;
     }

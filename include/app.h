@@ -14,6 +14,7 @@ typedef struct {
 
 	SDL_Texture *background;
 	SDL_Texture *player_texture;
+	SDL_Texture *grass_tile;
 
 	SDL_FRect player_sprite_offset_rect;
 	SDL_FRect player_location;
@@ -25,8 +26,17 @@ typedef struct {
 	uint64_t last_tick;
 	uint64_t current_tick;
 	float delta_time;
+
 } app_t;
 
+/*
+	Logs an error.
+*/
 void log_error(char *prefix);
+
+/*
+	Clamp a value within a range.
+*/
+float clamp (float n, float min, float max);
 
 #endif
