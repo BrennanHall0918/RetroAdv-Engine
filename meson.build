@@ -14,6 +14,8 @@ add_project_arguments('-g3', language: 'c')
 os = target_machine.system()
 dependencies = []
 resources = []
+os_srces = []
+test_os_srces = []
 
 # Dependencies
 if os == 'windows'
@@ -24,6 +26,7 @@ if os == 'windows'
   # dynamic asan links libstc++.dll, let's link statically to avoid having to vendor the dll.
   add_project_arguments('-static-libasan', language: 'c')
   add_global_link_arguments('-mwindows', language: 'c')
+  test_os_srces += 'src/tests/windowsmain.c'
 endif
 
 sdl = dependency('SDL3', method:'cmake')
@@ -34,7 +37,15 @@ dependencies += [sdl, sdl_image, sqlite]
 incdir = include_directories('include')
 
 # Executable
-list_test = executable('list_test', ['src/lists/list.c', 'src/tests/list.c'], include_directories : incdir, install: false)
+list_test = executable(
+  'list_test',
+  [
+    'src/lists/list.c',
+    'src/tests/list.c',
+  ] + test_os_srces,
+  include_directories : incdir,
+  install: false)
+
 test('list_test', list_test) 
 executable(
   'retroadv',

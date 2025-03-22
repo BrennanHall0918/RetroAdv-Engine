@@ -1,7 +1,7 @@
 #include "collections.h"
 #include <stdio.h>
 #include <stdbool.h>
-#include <windows.h>
+#include "testing.h"
 
 bool test_init_array(void) {
     collection_t* collections = new_array_list(sizeof(int));
@@ -39,7 +39,7 @@ bool run_test(char* func_name, bool (*func)(void)) {
     return true;
 }
  
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow) {
+int main(void) {
     int failed_test = 0;
 
     if (!run_test("test_init_array", test_init_array)) {
