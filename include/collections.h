@@ -17,7 +17,7 @@ typedef struct collection {
      * Execute the provided function for each element in the collection,
      * return true if any_func returns true for any element.
      */
-    bool (*any)(bool (*any_func)(void *item));
+    bool (*any)(struct collection*, bool (*any_func)(void *item));
 
     /*
      * Filter a collection. Returns a new collection with a copy of the data.
@@ -27,18 +27,18 @@ typedef struct collection {
     /*
      * Call the provided function for each element in the collection.
      */
-    void (*for_each)(void (*for_each_func)(void *next));
+    void (*for_each)(struct collection*, void (*for_each_func)(void *next));
 
     /*
      * Map elements from a collection into a new collection.
      * The provided size is the size of the elements in the new collection.
      */
-    struct collection* (*map)(void* (*map_func)(void *item), size_t size);
+    struct collection* (*map)(struct collection*, void* (*map_func)(void *item), size_t size);
 
     /*
      * Reduce the collection to a single item.
      */
-    void* (*reduce)(void* initial, void* (*reduce_func)(void* next, void* current));
+    void* (*reduce)(struct collection*, void* initial, void* (*reduce_func)(void* next, void* current), size_t size);
 
     /*
      * Clean up the collection. If free_func is not NULL, this function

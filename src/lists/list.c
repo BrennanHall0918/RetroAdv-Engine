@@ -4,19 +4,31 @@
 #include <string.h>
 
 typedef struct list {
+    /*
+     * array: the collection of elements
+    */
     void *array;
+    /*
+    * item_size: size of each element
+    */
     size_t item_size;
+    /*
+    * length: number of elements in the array
+    */
     size_t length;
+    /*
+    * array_size: amount of memory dedicated to the array
+    */
     size_t array_size;
 } list_t;
 
 /*
- * Append an item to the end of the collection.
+ * Append an element to the end of the collection.
  */
 static void add(collection_t* self, void* item) {
     list_t* list = (list_t*)self->data;
     /*
-     * IF adding this item to the end of this array would extend past the size of the array, reallocate (realloc)
+     * IF adding this element to the end of this array would extend past the size of the array, reallocate (realloc)
      * the array to the size of the array * 2
      */
     if ((list->item_size * list->length) + list->item_size > list->array_size) {
@@ -31,11 +43,17 @@ static void add(collection_t* self, void* item) {
 }
 
 /*
- * Execute the provided function for each element in the collection,
+ * Execute the provided function for each element in the collection (array),
  * return true if any_func returns true for any element.
  */
-static bool any(bool (*any_func)(void *item)) {
-    return false; //stub
+static bool any(collection_t* self, bool (*any_func)(void *item)) {
+    list_t* list = (list_t*)self->data;
+    for (int i = 0; i < list->length; i++) {
+        if (any_func(self->at(self, i))) {
+            return true;
+        }
+    }
+    return false;
 }
 /*
  * Filter a collection. Returns a new collection with a copy of the data.
@@ -54,23 +72,46 @@ static collection_t* filter(collection_t* self, bool (*filter_func)(void *item))
 /*
  * Call the provided function for each element in the collection.
  */
-static void for_each(void (*for_each_func)(void *next)) {
-    //stub
+static void for_each(collection_t* self, void (*for_each_func)(void *next)) {
+    list_t* list = (list_t*)self->data;
+
+    for (int i = 0; i < list->length; i++) {
+        for_each_func(self->at(self, i));
+    }
 }
 
 /*
  * Map elements from a collection into a new collection.
  * The provided size is the size of the elements in the new collection.
  */
-static collection_t* map(void* (*map_func)(void *item), size_t size) {
-    return NULL; //stub
+static collection_t* map(collection_t* self, void* (*map_func)(void *item), size_t size) {
+    list_t* list = (list_t*)self->data;
+    collection_t* collection = new_array_list(size);
+
+    for (int i = 0; i < list->length; i++) {
+        void* new_item = map_func(self->at(self, i));
+        collection->add(collection, new_item);
+        free(new_item);
+    }
+
+    return collection;
 }
 
 /*
  * Reduce the collection to a single item.
  */
-static void* reduce(void* initial, void* (*reduce_func)(void* next, void* current)) {
-    return NULL; //stub
+static void* reduce(collection_t* self, void* initial, void* (*reduce_func)(void* next, void* current), size_t size) {
+    list_t* list = (list_t*)self->data;
+    void* result = malloc(size);
+    memcpy(result, initial, size);
+
+    for (int i = 0; i < list->length; i++) {
+        void* temp = reduce_func(self->at(self, i), result);
+        result = memcpy(result, temp, size);
+        free(temp);
+    }
+
+    return result;
 }
 
 /*
@@ -85,7 +126,9 @@ static void cleanup(collection_t *self, void (*free_func)(void *item)) {
  * Return the number of elements in the collection.
  */
 static size_t count(collection_t *self) {
-    return 0; //stub
+    list_t* list = (list_t*)self->data;
+
+    return list->length;
 }
 
 static void* at(collection_t *self, size_t i) {
