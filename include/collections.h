@@ -1,6 +1,7 @@
 #ifndef _COLLECTIONS_H_
 #define _COLLECTIONS_H_
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -59,5 +60,61 @@ typedef struct collection {
 } collection_t;
 
 collection_t* new_array_list(size_t size);
+
+/*
+ * Hashable interface.
+ */
+typedef struct hashable {
+    /*
+     * Convert the hashable item into a 64-bit hash.
+     */
+    uint64_t (*hash)(void);
+
+    /*
+     * The actual data to be hashed.
+     */
+    void* data;
+
+    /*
+     * Free the hashable item.
+     */
+    void (*destroy)();
+} hashable_t;
+
+/*
+ * Create a hashable from a nul-terminated c-string.
+ */
+hashable_t *char_hashable_init(char* str);
+
+/*
+ * A hash map provides quick access to items by providing a key.
+ */
+typedef void* hash_map_t;
+
+/*
+ * Initialize a new hashmap.
+ */
+hash_map_t* hash_map_init(size_t value_size);
+
+/*
+ * Retrieve a value from the given key, or NULL if the key does not exist.
+ */
+void* hash_map_get(hash_map_t* self, hashable_t *key);
+
+/*
+ * Set the value for a given key.
+ * This will change the value if the key already exists.
+ */
+void hash_map_set(hash_map_t* self, hashable_t* key, void* value);
+
+/*
+ * Retrieve the collection of hashable_t items used as keys.
+ */
+collection_t* hash_map_keys(hash_map_t* self);
+
+/*
+ * Free the hash map.
+ */
+void hash_map_destroy(hash_map_t* self);
 
 #endif
