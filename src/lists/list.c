@@ -131,6 +131,12 @@ static size_t count(collection_t *self) {
     return list->length;
 }
 
+static void set(collection_t *self, void* value, size_t i) {
+    list_t* list = (list_t*)self->data;
+
+    memcpy((list->array) + (list->array_size * i), value, list->item_size);
+} 
+
 static void* at(collection_t *self, size_t i) {
     list_t* list = (list_t*)self->data;
     char* u8_array = (char*)list->array;
@@ -158,6 +164,7 @@ collection_t* new_array_list(size_t size) {
     collection->count = count;
     collection->size = size;
     collection->at = at;
+    collection->set = set;
 
     return collection;
 }
