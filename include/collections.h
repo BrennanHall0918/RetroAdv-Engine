@@ -52,7 +52,9 @@ typedef struct collection {
      */
     size_t (*count)(struct collection *self);
 
-    void* (*at)(struct collection*, size_t i);
+    void (*set)(struct collection* self, void* value, size_t i);
+
+    void* (*at)(struct collection* self, size_t i);
 
     size_t size;
 
@@ -68,23 +70,28 @@ typedef struct hashable {
     /*
      * Convert the hashable item into a 64-bit hash.
      */
-    uint64_t (*hash)(void);
+    uint64_t (*hash)(struct hashable* self);
 
     /*
      * The actual data to be hashed.
      */
     void* data;
 
+    /* size (in bytes) of the data*/
+    size_t len;
+
+    uint64_t precomputed_hash;
+
     /*
      * Free the hashable item.
      */
-    void (*destroy)();
+    void (*destroy)(struct hashable* self);
 } hashable_t;
 
 /*
- * Create a hashable from a nul-terminated c-string.
+ * Create a hashable
  */
-hashable_t *char_hashable_init(char* str);
+hashable_t *hashable_init(uint8_t* data, size_t len);
 
 /*
  * A hash map provides quick access to items by providing a key.

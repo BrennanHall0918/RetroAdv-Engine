@@ -55,6 +55,8 @@ executable(
       'src/drawloop.c',
       'src/entity.c',
       'src/utils.c',
+      'src/lists/list.c',
+      'src/lists/hashmap.c',
   ],
   include_directories : incdir,
   dependencies: dependencies,
