@@ -46,7 +46,18 @@ list_test = executable(
   include_directories : incdir,
   install: false)
 
+  hashmap_test = executable(
+  'hashmap_test',
+  [
+    'src/lists/list.c',
+    'src/lists/hashmap.c',
+    'src/tests/hashmap.c',
+  ] + test_os_srces,
+  include_directories : incdir,
+  install: false)
+
 test('list_test', list_test) 
+test('hashmap_test', hashmap_test)
 executable(
   'retroadv',
   [
