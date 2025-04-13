@@ -48,7 +48,7 @@ typedef struct {
     size_t value_size;
 }kvp_t;
 
-static void destory_kvp(kvp_t* kvp) {
+static void destroy_kvp(kvp_t* kvp) {
     kvp->key->destroy(kvp->key);
     free(kvp->value);
     free(kvp);
@@ -73,6 +73,8 @@ static collection_t* init_buckets(size_t len) {
         bucket.kvp_list = new_array_list(sizeof(kvp_t));
         buckets->add(buckets, &bucket);
     }
+
+    return buckets;
 }
 
 /*
@@ -93,8 +95,20 @@ hash_map_t* hash_map_init(size_t value_size) {
  * Retrieve a value from the given key, or NULL if the key does not exist.
  */
 void* hash_map_get(hash_map_t* self, hashable_t *key) {
+    private_hash_map_t* hash_map = (private_hash_map_t*)self;
+    uint64_t hash = key->hash(key) % hash_map->len;
+    bucket_t* bucket = (bucket_t*)(hash_map->buckets->at(hash_map->buckets, hash));
 
-    return NULL; /*stub*/
+
+    for(size_t i = 0; i < bucket->kvp_list->count(bucket->kvp_list); i++) {
+        kvp_t* kvp = bucket->kvp_list->at(bucket->kvp_list, i);
+
+        if((kvp->key->len == key->len) && (memcmp(kvp->key->data, key->data, key->len) == 0)) {
+            return kvp->value;
+        }
+    }
+
+    return NULL;
 }
 
 static void buckets_add_kvp(collection_t* buckets, kvp_t* kvp) {
@@ -128,7 +142,6 @@ static void buckets_add_kvp(collection_t* buckets, kvp_t* kvp) {
  * This will change the value if the key already exists.
  */
 void hash_map_set(hash_map_t* self, hashable_t* key, void* value) {
-    uint64_t hash = key->hash(key->hash);
     private_hash_map_t* priv = (private_hash_map_t*)self;
     size_t count =  priv->buckets->count(priv->buckets);
 
@@ -152,7 +165,7 @@ void hash_map_set(hash_map_t* self, hashable_t* key, void* value) {
 
     buckets_add_kvp(priv->buckets, new_kvp);
 
-    return; /*stub*/
+    return;
 }
 
 /*
