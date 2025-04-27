@@ -1,8 +1,9 @@
-#include "collections.h"
 #define _GNU_SOURCE
+#include "collections.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "testing.h"
 
 bool test_hash(void) {
@@ -20,19 +21,23 @@ typedef struct value {
 
 bool test_hashmap_get_set(void) {
     value_t* values = malloc(sizeof(value_t) * 1000);
-    hash_map_t* hash_map = hash_map_init(sizeof(value_t));
+    hash_map_t* hash_map = hash_map_init(sizeof(uint64_t));
 
     for(int i = 0; i < 1000; i++) {
         asprintf(&(values[i].str), "Test%d", i);
         values[i].value = i;
-        hashable_t* hashable = hashable_init((uint8_t*)values[i].str, strlen(values[i].str));
+        hashable_t* hashable = hashable_init(values[i].str, strlen(values[i].str));
         hash_map_set(hash_map, hashable, &(values[i].value)); 
     }
 
-    hashable_t* hashable = hashable_init((uint8_t*)values[10].str, strlen(values[10].str));
-    uint64_t* value = (uint64_t*)hash_map_get(hash_map, hashable);
+    hashable_t* hashable = hashable_init(values[10].str, strlen(values[10].str));
+    uint64_t* value = hash_map_get(hash_map, hashable);
 
-    return *value == 9;
+    if (value == NULL) {
+        return false;
+    }
+
+    return *value == 10;
 }
 
 bool run_test(char* func_name, bool (*func)(void)) {

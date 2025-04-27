@@ -2,24 +2,30 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef struct list {
     /*
      * array: the collection of elements
-    */
+     */
     void *array;
     /*
-    * item_size: size of each element
-    */
+     * item_size: size of each element
+     */
     size_t item_size;
     /*
-    * length: number of elements in the array
-    */
+     * length: number of elements in the array
+     */
     size_t length;
     /*
-    * array_size: amount of memory dedicated to the array
-    */
+     * array_size: amount of memory dedicated to the array
+     */
     size_t array_size;
+
+    /*
+     * element_cleanup: Free an element.
+     */
+    void (*element_cleanup)(void *item);
 } list_t;
 
 /*
@@ -32,13 +38,13 @@ static void add(collection_t* self, void* item) {
      * the array to the size of the array * 2
      */
     if ((list->item_size * list->length) + list->item_size > list->array_size) {
-        list->array = realloc(list->array, list->array_size * 2);
-
-        list->array_size = list->array_size * 2;
+        size_t new_size = list->array_size * 2;
+        list->array = realloc(list->array, new_size);
+        list->array_size = new_size;
     }
 
-    char* u8_array = (char*)list->array;
-    memcpy(u8_array + (list->item_size * list->length), item, list->item_size);
+    void* addr = list->array + (list->item_size * list->length);
+    memcpy(addr, item, list->item_size);
     list->length++;
 }
 
@@ -59,13 +65,15 @@ static bool any(collection_t* self, bool (*any_func)(void *item)) {
  * Filter a collection. Returns a new collection with a copy of the data.
  */
 static collection_t* filter(collection_t* self, bool (*filter_func)(void *item)) {
-    collection_t* collection = new_array_list(self->size);
     list_t* list = (list_t*)self->data;
+    collection_t* collection = new_array_list(self->size, list->element_cleanup);
+
     for (int i = 0; i < list->length; i++) {
         if (filter_func(self->at(self, i))) {
             collection->add(collection, self->at(self, i));
         }
     }
+
     return collection; //stub
 }
 
@@ -86,7 +94,7 @@ static void for_each(collection_t* self, void (*for_each_func)(void *next)) {
  */
 static collection_t* map(collection_t* self, void* (*map_func)(void *item), size_t size) {
     list_t* list = (list_t*)self->data;
-    collection_t* collection = new_array_list(size);
+    collection_t* collection = new_array_list(size, NULL);
 
     for (int i = 0; i < list->length; i++) {
         void* new_item = map_func(self->at(self, i));
@@ -118,8 +126,15 @@ static void* reduce(collection_t* self, void* initial, void* (*reduce_func)(void
  * Clean up the collection. If free_func is not NULL, this function
  * will be called to deconstruct each individual element.
  */
-static void cleanup(collection_t *self, void (*free_func)(void *item)) {
-    //stub
+static void cleanup(collection_t **self) {
+    list_t* list = (list_t*)(*self)->data;
+    if (list->element_cleanup != NULL) {
+        (*self)->for_each(*self, list->element_cleanup);
+    }
+
+    free(list->array);
+    free((*self)->data);
+    free(*self);
 }
 
 /*
@@ -127,24 +142,27 @@ static void cleanup(collection_t *self, void (*free_func)(void *item)) {
  */
 static size_t count(collection_t *self) {
     list_t* list = (list_t*)self->data;
-
     return list->length;
 }
 
 static void set(collection_t *self, void* value, size_t i) {
     list_t* list = (list_t*)self->data;
+    void* item = self->at(self, i);
 
-    memcpy((list->array) + (list->array_size * i), value, list->item_size);
+    if (list->element_cleanup != NULL) {
+        list->element_cleanup(item);
+    }
+
+    memcpy(item, value, list->item_size);
 } 
 
 static void* at(collection_t *self, size_t i) {
     list_t* list = (list_t*)self->data;
-    char* u8_array = (char*)list->array;
 
-    return (void*)(u8_array +i * list->item_size);
+    return (void*)(list->array + (i * list->item_size));
 } 
 
-collection_t* new_array_list(size_t size) {
+collection_t* new_array_list(size_t size, void (*cleanup_func)(void *item)) {
     collection_t* collection = malloc(sizeof(collection_t));
     list_t* list = malloc(sizeof(list_t));
 
@@ -152,6 +170,7 @@ collection_t* new_array_list(size_t size) {
     list->item_size = size;
     list->length = 0;
     list->array_size = size * 2;
+    list->element_cleanup = cleanup_func;
 
     collection->data = list;
     collection->add = add;
