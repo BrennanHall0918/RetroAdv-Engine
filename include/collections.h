@@ -42,10 +42,10 @@ typedef struct collection {
     void* (*reduce)(struct collection*, void* initial, void* (*reduce_func)(void* next, void* current), size_t size);
 
     /*
-     * Clean up the collection. If free_func is not NULL, this function
+     * Clean up the collection. If element_cleanup is not NULL, this function
      * will be called to deconstruct each individual element.
      */
-    void (*cleanup)(struct collection *self, void (*free_func)(void *item));
+    void (*cleanup)(struct collection **self);
 
     /*
      * Return the number of elements in the collection.
@@ -61,7 +61,12 @@ typedef struct collection {
     void *data;
 } collection_t;
 
-collection_t* new_array_list(size_t size);
+/*
+ * new_array_list: construct a new array list.
+ * size: The size of a list element.
+ * cleanup: optional cleanup function for individual elements.
+ */
+collection_t* new_array_list(size_t size, void (*cleanup)(void* item));
 
 /*
  * Hashable interface.
@@ -85,13 +90,13 @@ typedef struct hashable {
     /*
      * Free the hashable item.
      */
-    void (*destroy)(struct hashable* self);
+    void (*destroy)(struct hashable** self);
 } hashable_t;
 
 /*
  * Create a hashable
  */
-hashable_t *hashable_init(uint8_t* data, size_t len);
+hashable_t *hashable_init(void* data, size_t len);
 
 /*
  * A hash map provides quick access to items by providing a key.
