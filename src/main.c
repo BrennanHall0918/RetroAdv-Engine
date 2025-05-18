@@ -45,6 +45,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     }
 
     state->entity_types = get_entity_types();
+    state->entity_tags = get_entity_type_tags();
 
     return SDL_APP_CONTINUE;
 }

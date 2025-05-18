@@ -43,17 +43,17 @@ typedef struct {
     int width;
     int height;
 
-    collection_t *sprite_sheets;
-    collection_t *tags;
 } entity_type_t;
 
 typedef struct{
     int tag_id;
-    char* tag;
+    char* entity_tag;
 
     int duration;
     int timestamp;
-} tag_t;
+
+    hashable_t* entity_type;
+} entity_tag_t;
 
 typedef struct {
     int sprite_sheet_id;
@@ -68,7 +68,7 @@ typedef struct {
     int entity_sprite_set_id;
     hashable_t *sprite_sheet_hashable;
 
-    int entity_id;
+    int entity_type_id;
     int sprite_sheet_id;
     int tag_id;
 
@@ -77,6 +77,8 @@ typedef struct {
     int sprite_width;
     int sprite_height;
     int stride;
+    int frames;
+    char* path;
 } entity_sprite_set_t;
 
 

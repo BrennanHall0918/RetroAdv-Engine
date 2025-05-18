@@ -24,7 +24,7 @@ typedef struct {
 	collection_t* entities;
 	hash_map_t* entity_sprite_sets;
 	hash_map_t* sprite_sheets;
-	hash_map_t* tags;
+	hash_map_t* entity_tags;
 	hash_map_t* entity_types;
 
 	uint64_t last_tick;

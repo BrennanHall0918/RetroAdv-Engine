@@ -38,23 +38,31 @@ CREATE TABLE IF NOT EXISTS entity_type (
   height INTEGER,
 ) STRICT;
 
-CREATE TABLE IF NOT EXISTS entity_tag (
+CREATE TABLE IF NOT EXISTS entity_type_tag (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   tag TEXT,
   duration INTEGER,
-  entity_id INTEGER,
-  FOREIGN KEY (entity_id) REFERENCES entity_type (id)
+  entity_type_id INTEGER,
+  FOREIGN KEY (entity_type_id) REFERENCES entity_type (id)
 ) STRICT;
 
-CREATE TABLE IF NOT EXISTS entity_sprite_sheet (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  entity_id INTEGER,
-  sprite_sheet_id INTEGER,
-  tag_id INTEGER,
-  FOREIGN KEY (entity_id) REFERENCES entity_type (id),
-  FOREIGN KEY (sprite_sheet_id) REFERENCES sprite_sheet (id),
-  FOREIGN KEY (tag_id) REFERENCES tag (id)
-) STRICT;
+CREATE INDEX idx_entity_type_tag_entity_id ON entity_type_tag (entity_type_id);
+
+  CREATE TABLE IF NOT EXISTS entity_sprite_set (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    entity_type_id INTEGER,
+    sprite_sheet_id INTEGER,
+    tag_id INTEGER,
+    offset_x INTEGER,
+    offset_y INTEGER,
+    sprite_width INTEGER,
+    sprite_height INTEGER,
+    stride INTEGER,
+    frames INTEGER,
+    FOREIGN KEY (entity_type_id) REFERENCES entity_type (id),
+    FOREIGN KEY (sprite_sheet_id) REFERENCES sprite_sheet (id),
+    FOREIGN KEY (tag_id) REFERENCES entity_type_tag (id)
+  ) STRICT;
 
 
 

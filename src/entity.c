@@ -2,6 +2,7 @@
 #include "entity.h"
 #include <SDL3_image/SDL_image.h>
 #include <stdio.h>
+#include "repo.h"
 
 static void destroy(void* self)
 {
@@ -95,12 +96,20 @@ static SDL_FRect create_rect(float x, float y, float w, float h)
 	return rect;
 } 
 
-bool init_entity (entity_t* entity, SDL_Renderer* renderer, char* path)
+bool new_entity (app_t* state, char* entity_type, SDL_Renderer* renderer, char* path)
 {
+    entity_t* entity = malloc(sizeof(entity));
+    hashable_t* hashable = hashable_init(entity_type, strlen(entity_type));
+    entity_type_t* type = hash_map_get(state->entity_types, hashable);
+
     entity->velocity_x = 0;
     entity->velocity_y = 0;
-    entity->maximum_speed = 100;
-    entity->acceleration = 5;
+    entity->maximum_speed = type->maximum_speed;
+    entity->acceleration = type->acceleration;
+    entity->width = type->width;
+    entity->height = type->height;
+    entity->entity_type = hashable;
+    entity->tags = get_entity_type_tags_by_entity(type->entity_id);
     entity->destroy = &destroy;
     entity->handle_events = &handle_events;
     entity->update = &update;
