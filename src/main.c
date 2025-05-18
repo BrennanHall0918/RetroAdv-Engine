@@ -8,11 +8,12 @@
 
 #include "app.h"
 #include "entity.h"
+#include "repo.h"
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     app_t *state = malloc(sizeof(app_t));
     *appstate = state;
-    state->entities = malloc(sizeof(entity_t)*N_ENTITIES);
+    state->entities = new_array_list(sizeof(entity_t), NULL);
 
     state->last_tick = 0;
     state->current_tick = 0;
@@ -41,12 +42,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     if (!state->grass_tile) {
         log_error("Error getting texture");
         return false;
-    }    
-
-    if (!init_entity(&(state->entities[0]), state->renderer, "./char_spritesheet.png"))
-    {
-        return SDL_APP_FAILURE;
     }
+
+    state->entity_types = get_entity_types();
 
     return SDL_APP_CONTINUE;
 }
@@ -54,9 +52,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
     app_t *state = (app_t *)appstate;
 
-    for (int i = 0; i < N_ENTITIES; i++)
+    for (size_t i = 0; i < state->entities->count(state->entities); i++)
     {
-        state->entities[i].destroy((void*)(state->entities+i));
+        entity_t* entity = state->entities->at(state->entities, i);
+        entity->destroy(entity);
     }
 
     free(state->entities);

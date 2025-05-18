@@ -68,6 +68,8 @@ executable(
       'src/utils.c',
       'src/lists/list.c',
       'src/lists/hashmap.c',
+      'src/repo/database.c',
+      'src/repo/entity_repo.c',
   ],
   include_directories : incdir,
   dependencies: dependencies,

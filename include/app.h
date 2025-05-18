@@ -3,9 +3,9 @@
 
 #include <SDL3/SDL.h>
 #include "entity.h"
+#include "collections.h"
 #include <inttypes.h>
-
-#define N_ENTITIES 1
+#include <sqlite3.h>
 
 typedef struct {
 	SDL_Window *window;
@@ -21,7 +21,11 @@ typedef struct {
 
 	SDL_IOStreamInterface iface;
 
-	entity_t* entities;
+	collection_t* entities;
+	hash_map_t* entity_sprite_sets;
+	hash_map_t* sprite_sheets;
+	hash_map_t* tags;
+	hash_map_t* entity_types;
 
 	uint64_t last_tick;
 	uint64_t current_tick;

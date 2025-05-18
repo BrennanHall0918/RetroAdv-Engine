@@ -11,9 +11,10 @@ void render(app_t* state)
 
 	SDL_RenderTextureTiled(state->renderer, state->grass_tile, NULL, 1, NULL);
 
-	for (int i = 0; i < N_ENTITIES; i++) 
+	for (size_t i = 0; i < state->entities->count(state->entities); i++) 
 	{
-		state->entities[i].render((void*)(state->entities+i), state->renderer);
+		entity_t* entity = state->entities->at(state->entities, i);
+		entity->render(entity, state->renderer);
 	}
 
 	SDL_RenderPresent(state->renderer);
@@ -29,14 +30,16 @@ SDL_AppResult SDL_AppIterate(void *appstate, SDL_Event *event)
 	state->delta_time = (state->current_tick - state->last_tick) / 1000.0f;
 	render(state);
 
-	for (int i = 0; i < N_ENTITIES; i++) 
+	for (size_t i = 0; i < state->entities->count(state->entities); i++) 
 	{
-		state->entities[i].handle_events((void*)(state->entities+i), event);
+		entity_t* entity = state->entities->at(state->entities, i);
+		entity->handle_events(entity, event);
 	}
 
-	for (int i = 0; i < N_ENTITIES; i++) 
+	for (size_t i = 0; i < state->entities->count(state->entities); i++) 
 	{
-		state->entities[i].update((void*)(state->entities+i), state->delta_time);
+		entity_t* entity = state->entities->at(state->entities, i);
+		entity->update(entity, state->delta_time);
 	}
 
 	return SDL_APP_CONTINUE;
